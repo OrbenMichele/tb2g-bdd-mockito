@@ -2,7 +2,7 @@ package morben.springframework.sfgpetclinic.services.springdatajpa;
 
 import morben.springframework.sfgpetclinic.model.Speciality;
 import morben.springframework.sfgpetclinic.repositories.SpecialtyRepository;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static org.mockito.BDDMockito.*;
 
@@ -114,4 +115,41 @@ class SpecialitySDJpaServiceTest {
         //then
         then(specialtyRepository).should().delete(any(Speciality.class));
     }
+
+    @Test
+    void testThrow() {
+
+        doThrow(new RuntimeException("Boom")).when(specialtyRepository).delete(any());
+
+        assertThrows(RuntimeException.class, () -> specialtyRepository.delete(new Speciality()));
+        verify(specialtyRepository).delete(any());
+    }
+
+    @Test
+    void testFindByIdThrows() {
+        //given
+        given(specialtyRepository.findById(1l)).willThrow(new RuntimeException("Boom"));
+
+        //when
+        assertThrows(RuntimeException.class, () -> service.findById(1l));
+
+        //then
+        then(specialtyRepository).should().findById(1l);
+    }
+
+    @Test
+    void testDeleteBDD() {
+
+        //given
+        willThrow(new RuntimeException("Boom")).given(specialtyRepository).delete(any());
+
+        //when
+        assertThrows(RuntimeException.class, () -> service.delete(new Speciality()));
+
+        //then
+        then(specialtyRepository).should().delete(any());
+
+
+    }
+
 }

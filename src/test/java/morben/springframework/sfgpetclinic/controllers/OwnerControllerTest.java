@@ -95,6 +95,7 @@ class OwnerControllerTest {
     void processFindFormWildcardFound() {
         //given
         Owner owner = new Owner(1l, "Joe", "FindMe");
+        InOrder inOrder = inOrder(ownerService, model);
 
         //when
         String viewName = ownerController.processFindForm(owner, bindingResult,
@@ -103,6 +104,10 @@ class OwnerControllerTest {
         //then
         assertThat("%FindMe%").isEqualToIgnoringCase(stringArgumentCaptor.getValue());
         assertThat("owners/ownersList").isEqualToIgnoringCase(viewName);
+
+        //inorder asserts
+        inOrder.verify(ownerService).findAllByLastNameLike(anyString());
+        inOrder.verify(model).addAttribute(anyString(), anyList());
     }
 
 //    @Test
